@@ -7,7 +7,7 @@ class Synchronized_Benchmark_Timer(Benchmark_Timer):
     def __init__(self,
                  synchronization_func: Callable,
                  timer_func: Optional[Callable] = time.perf_counter_ns,
-                 output_unit_conversion: Optional[int] = 1e9,
+                 output_unit_conversion: Optional[int] = 1e-9,
                  output_unit: Optional[str] = 'seconds'
                  ):
         self._synchronization_func = synchronization_func
