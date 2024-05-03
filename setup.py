@@ -9,7 +9,7 @@ setup(
     author='Niklas Roemer',
     author_email='nroemer@ethz.ch',
     url='https://github.com/nrmer/Benchmark_Suite',
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     install_requires=[],
     packages=find_packages(),
 )
