@@ -133,6 +133,7 @@ class Benchmark_Timer():
                     stream_names: Optional[list] = None,
                     times_path: Optional[str] = None,
                     times_filename_decorator: Optional[str] = '',
+                    additional_data: Optional[dict] = None
                     ):
         if stream_names is None:
             stream_names = []
@@ -145,11 +146,19 @@ class Benchmark_Timer():
                     raise Exception(f'The {stream} timer is still running. Stop the timer before saving the results to the file')
                 if times_filename_decorator is not None:
                     with open(times_path + '/' + stream + times_filename_decorator + '.csv', 'a') as fp:
+                        if additional_data is not None and stream in additional_data:
+                            for i in additional_data[stream][0:-1]:
+                                fp.write(str(i) + ',')
+                            fp.write(str(additional_data[stream][-1]) + '\n')
                         for i in range(0, len(self._time[stream]), 2):
                             fp.write(str(self._time[stream][i]) + ',' + str(self._time[stream][i + 1]) + ',' +
                                     str((self._time[stream][i + 1] - self._time[stream][i]) * self._scaling_factor) + '\n')
                 else:
                     with open(times_path + '/' + stream + '.csv', 'a') as fp:
+                        if additional_data is not None and stream in additional_data:
+                            for i in additional_data[stream][0:-1]:
+                                fp.write(str(i) + ',')
+                            fp.write(str(additional_data[stream][-1]) + '\n')
                         for i in range(0, len(self._time[stream]), 2):
                             fp.write(str(self._time[stream][i]) + ',' + str(self._time[stream][i + 1]) + ',' +
                                     str((self._time[stream][i + 1] - self._time[stream][i]) * self._scaling_factor) + '\n')
@@ -159,11 +168,19 @@ class Benchmark_Timer():
                     raise Exception(f'The {stream} timer is still running. Stop the timer before saving the results to the file')
                 if times_filename_decorator is not None:
                     with open(stream + times_filename_decorator + '.csv', 'a') as fp:
+                        if additional_data is not None and stream in additional_data:
+                            for i in additional_data[stream][0:-1]:
+                                fp.write(str(i) + ',')
+                            fp.write(str(additional_data[stream][-1]) + '\n')
                         for i in range(0, len(self._time[stream]), 2):
                             fp.write(str(self._time[stream][i]) + ',' + str(self._time[stream][i + 1]) + ',' +
                                     str((self._time[stream][i + 1] - self._time[stream][i]) * self._scaling_factor) + '\n')
                 else:
                     with open(stream + '.csv', 'a') as fp:
+                        if additional_data is not None and stream in additional_data:
+                            for i in additional_data[stream][0:-1]:
+                                fp.write(str(i) + ',')
+                            fp.write(str(additional_data[stream][-1]) + '\n')
                         for i in range(0, len(self._time[stream]), 2):
                             fp.write(str(self._time[stream][i]) + ',' + str(self._time[stream][i + 1]) + ',' +
                                     str((self._time[stream][i + 1] - self._time[stream][i]) * self._scaling_factor) + '\n')

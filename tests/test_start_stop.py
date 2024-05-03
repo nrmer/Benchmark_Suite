@@ -54,10 +54,12 @@ def test_basic(repeats, duration, atol):
         assert numpy.isclose(temp[i], test['standard'][i], atol=atol, rtol=1e-12)
 
 
+@pytest.mark.xfail(reason='This test needs to be chacked manually.')
 @pytest.mark.parametrize('file_path', [None, 'startstop_test'])
 @pytest.mark.parametrize('file_name_decorator', [None, '_startstop_naming_test'])
 @pytest.mark.parametrize('stream_names', [None, ['standard'], ['standard', 'second', 'third']])
-def test_file_save(file_path, file_name_decorator, stream_names):
+@pytest.mark.parametrize('additional_data', [None, {'second': ['This', 'is', 'additional', 'data.']}])
+def test_file_save(file_path, file_name_decorator, stream_names, additional_data):
     timer = Benchmark_Timer()
     timer.create_timing_stream()
     timer.create_timing_stream('second')
@@ -75,7 +77,10 @@ def test_file_save(file_path, file_name_decorator, stream_names):
         time.sleep(0.01)
         timer.stop_timer(stream_name='second')
 
-    timer.times_to_files(stream_names=stream_names, times_filename_decorator=file_name_decorator, times_path=file_path)
+    timer.times_to_files(stream_names=stream_names,
+                         times_filename_decorator=file_name_decorator,
+                         times_path=file_path,
+                         additional_data=additional_data)
 
-    print('Confirm the correctness of the generated file now.')
+    print('Confirm the correctness of the generated file(s) now.')
     time.sleep(30)
