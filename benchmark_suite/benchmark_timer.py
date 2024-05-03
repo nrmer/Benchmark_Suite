@@ -173,7 +173,7 @@ class Benchmark_Timer():
                 if self._running[stream] == 1:
                     raise Exception(f'The {stream} timer is still running. Stop the timer before saving the results to the file')
                 if times_filename_decorator is not None:
-                    with open(times_path + '/' + stream + times_filename_decorator + '.csv', 'a') as fp:
+                    with open(times_path + '/' + stream + '_' + times_filename_decorator + '.csv', 'a') as fp:
                         if additional_data is not None and stream in additional_data:
                             for i in additional_data[stream][0:-1]:
                                 fp.write(str(i) + ',')
@@ -195,7 +195,7 @@ class Benchmark_Timer():
                 if self._running[stream] == 1:
                     raise Exception(f'The {stream} timer is still running. Stop the timer before saving the results to the file')
                 if times_filename_decorator is not None:
-                    with open(stream + times_filename_decorator + '.csv', 'a') as fp:
+                    with open(stream + '_' + times_filename_decorator + '.csv', 'a') as fp:
                         if additional_data is not None and stream in additional_data:
                             for i in additional_data[stream][0:-1]:
                                 fp.write(str(i) + ',')
