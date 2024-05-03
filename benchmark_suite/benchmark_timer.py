@@ -14,6 +14,7 @@ class Benchmark_Timer():
         self._time = {}
         self._interval = {}
         self._running = {}
+        self._special_streams = {}
         self._scaling_factor = output_unit_conversion
         self._scaling_unit = output_unit
 
@@ -25,6 +26,14 @@ class Benchmark_Timer():
         self._time[stream_name] = []
         self._interval[stream_name] = []
         self._running[stream_name] = 0
+
+
+    def create_special_stream(self,
+                             stream_name: Optional[str] = 'standard'
+                             ):
+        if stream_name in self._special_streams:
+            raise Exception(f'The special_stream {stream_name} already exists. Please choose a different name.')
+        self._special_streams[stream_name] = []
 
     def reset_times(self,
                     exceptions: Optional[list] = None
@@ -44,6 +53,14 @@ class Benchmark_Timer():
                 del self._interval[stream]
                 del self._running[stream]
 
+
+    def reset_special_streams(self,
+                      exceptions: Optional[list] = None
+                      ):
+        for stream in self._special_streams:
+            if not stream in exceptions:
+                del self._special_streams[stream]
+
     def start_timer(self,
                     stream_name: Optional[str] = 'standard'
                     ):
@@ -57,7 +74,8 @@ class Benchmark_Timer():
                    ouput: Optional[bool] = False,
                    ret: Optional[bool] = False
                    ):
-        self._time[stream_name].append(self._timer_func())
+        timing = self._timer_func()
+        self._time[stream_name].append(timing)
         if self._running[stream_name] == 0:
             raise Exception(f'The timing_stream {stream_name} was not running. It needs to be started before it can stop.')
         self._running[stream_name] = 0
@@ -66,6 +84,16 @@ class Benchmark_Timer():
         if ret:
             return (self._time[stream_name][-1] - self._time[stream_name][-2]) * self._scaling_factor
         
+
+
+    def special_stream_add(self,
+                      stream_name: Optional[str] = 'standard',
+                      input: Optional[list] = None
+                      ):
+        for element in input:
+            self._special_streams[stream_name].append(element)
+
+
 
     def interval(self,
                  stream_name: Optional[str] = 'standard'
@@ -186,18 +214,65 @@ class Benchmark_Timer():
                                     str((self._time[stream][i + 1] - self._time[stream][i]) * self._scaling_factor) + '\n')
                 
 
+    def special_streams_to_files(self,
+                    stream_names: Optional[list] = None,
+                    special_streams_path: Optional[str] = None,
+                    special_streams_filename: Optional[str] = None,
+                    additional_data: Optional[dict] = None
+                    ):
+        if special_streams_filename is None:
+            special_streams_filename = 'special_streams'
+        if stream_names is None:
+            stream_names = []
+            for stream in self._special_streams:
+                stream_names.append(stream)
+        if special_streams_path is not None:
+            self._create_path(special_streams_path)
+            with open(special_streams_path + '/' + special_streams_filename + '.csv', 'a') as fp:
+                for stream in stream_names:
+                    if additional_data is not None and stream in additional_data:
+                        for i in additional_data[stream]:
+                            fp.write(str(i) + ',')
+                    fp.write(str(stream) + ',')
+                    if len(self._special_streams[stream]) != 0:
+                        for i in self._special_streams[stream][0:-1]:
+                            fp.write(str(i) + ',')
+                        fp.write(str(self._special_streams[stream][-1]) + '\n')
+        else:
+            with open(special_streams_filename + '.csv', 'a') as fp:
+                for stream in stream_names:
+                    if additional_data is not None and stream in additional_data:
+                        for i in additional_data[stream]:
+                            fp.write(str(i) + ',')
+                    fp.write(str(stream) + ',')
+                    if len(self._special_streams[stream]) != 0:
+                        for i in self._special_streams[stream][0:-1]:
+                            fp.write(str(i) + ',')
+                        fp.write(str(self._special_streams[stream][-1]) + '\n')
+
+
+
 
     def return_dict(self,
                     times: Optional[bool] = False,
-                    intervals: Optional[bool] = False
+                    intervals: Optional[bool] = False,
+                    special_streams: Optional[bool] = False
                     ):
         interval_output = {}
         for stream in self._interval:
             interval_output[stream] = self._create_intervals(stream)
+        if times and intervals and special_streams:
+            return self._time, interval_output, self._special_streams
         if times and intervals:
             return self._time, interval_output
+        if times and special_streams:
+            return self._time, self._special_streams
+        if intervals and special_streams:
+            return interval_output, self._special_streams
         if times:
             return self._time
         if intervals:
             return interval_output
+        if special_streams:
+            return self._special_streams
         raise Exception('You need to choose at least one dictionary to output.')
