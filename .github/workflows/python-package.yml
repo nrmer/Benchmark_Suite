@@ -8,6 +8,7 @@ on:
     branches: [ "master", "test_automation" ]
   pull_request:
     branches: [ "master", "test_automation" ]
+  workflow_dispatch:
 
 jobs:
   build:
