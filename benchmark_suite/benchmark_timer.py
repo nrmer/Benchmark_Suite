@@ -71,7 +71,7 @@ class Benchmark_Timer():
 
     def stop_timer(self,
                    stream_name: Optional[str] = 'standard',
-                   ouput: Optional[bool] = False,
+                   output: Optional[bool] = False,
                    ret: Optional[bool] = False
                    ):
         timing = self._timer_func()
@@ -79,7 +79,7 @@ class Benchmark_Timer():
         if self._running[stream_name] == 0:
             raise Exception(f'The timing_stream {stream_name} was not running. It needs to be started before it can stop.')
         self._running[stream_name] = 0
-        if ouput:
+        if output:
             print(f'The measured time was {(self._time[stream_name][-1] - self._time[stream_name][-2]) * self._scaling_factor} {self._scaling_unit}.')
         if ret:
             return (self._time[stream_name][-1] - self._time[stream_name][-2]) * self._scaling_factor

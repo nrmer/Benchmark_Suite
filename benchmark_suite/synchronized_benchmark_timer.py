@@ -21,11 +21,11 @@ class Synchronized_Benchmark_Timer(Benchmark_Timer):
 
     def stop_timer(self,
                    stream_name: Optional[str] = 'standard',
-                   ouput: Optional[bool] = False,
+                   output: Optional[bool] = False,
                    ret: Optional[bool] = False
                    ):
         self._synchronization_func()
-        return super().stop_timer(stream_name=stream_name, ouput=ouput, ret=ret)
+        return super().stop_timer(stream_name=stream_name, output=output, ret=ret)
     
     def interval(self,
                  stream_name: Optional[str] = 'standard'
