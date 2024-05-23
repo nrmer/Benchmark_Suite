@@ -39,7 +39,7 @@ class Benchmark_Timer():
                     exceptions: Optional[list] = None
                     ):
         for stream in self._time:
-            if not stream in exceptions:
+            if exceptions == None or not stream in exceptions:
                 self._time[stream] = []
                 self._interval[stream] = []
                 self._running[stream] = 0
@@ -49,7 +49,7 @@ class Benchmark_Timer():
                       ):
         reset_list = []
         for stream in self._time:
-            if not stream in exceptions:
+            if exceptions == None or not stream in exceptions:
                 reset_list.append(stream)
         for stream in reset_list:
             del self._time[stream]
@@ -60,9 +60,12 @@ class Benchmark_Timer():
     def reset_special_streams(self,
                       exceptions: Optional[list] = None
                       ):
+        reset_list = []
         for stream in self._special_streams:
-            if not stream in exceptions:
-                del self._special_streams[stream]
+            if exceptions == None or not stream in exceptions:
+                reset_list.append(stream)
+        for stream in reset_list:
+            del self._special_streams[stream]
 
     def start_timer(self,
                     stream_name: Optional[str] = 'standard'
@@ -165,7 +168,8 @@ class Benchmark_Timer():
                     stream_names: Optional[list] = None,
                     times_path: Optional[str] = None,
                     times_filename_decorator: Optional[str] = '',
-                    additional_data: Optional[dict] = None
+                    additional_data: Optional[dict] = None,
+                    special_streams: Optional[list] = None
                     ):
         if stream_names is None:
             stream_names = []
@@ -184,7 +188,11 @@ class Benchmark_Timer():
                             fp.write(str(additional_data[stream][-1]) + '\n')
                         for i in range(0, len(self._time[stream]), 2):
                             fp.write(str(self._time[stream][i]) + ',' + str(self._time[stream][i + 1]) + ',' +
-                                    str((self._time[stream][i + 1] - self._time[stream][i]) * self._scaling_factor) + '\n')
+                                    str((self._time[stream][i + 1] - self._time[stream][i]) * self._scaling_factor))
+                            if special_streams is not None:
+                                for special_stream in special_streams:
+                                    fp.write(',' + str(self._special_streams[special_stream][int(i / 2)]))
+                            fp.write('\n')
                 else:
                     with open(times_path + '/' + stream + '.csv', 'a') as fp:
                         if additional_data is not None and stream in additional_data:
@@ -193,7 +201,11 @@ class Benchmark_Timer():
                             fp.write(str(additional_data[stream][-1]) + '\n')
                         for i in range(0, len(self._time[stream]), 2):
                             fp.write(str(self._time[stream][i]) + ',' + str(self._time[stream][i + 1]) + ',' +
-                                    str((self._time[stream][i + 1] - self._time[stream][i]) * self._scaling_factor) + '\n')
+                                    str((self._time[stream][i + 1] - self._time[stream][i]) * self._scaling_factor))
+                            if special_streams is not None:
+                                for special_stream in special_streams:
+                                    fp.write(',' + str(self._special_streams[special_stream][int(i / 2)]))
+                            fp.write('\n')
         else:
             for stream in stream_names:
                 if self._running[stream] == 1:
@@ -206,7 +218,11 @@ class Benchmark_Timer():
                             fp.write(str(additional_data[stream][-1]) + '\n')
                         for i in range(0, len(self._time[stream]), 2):
                             fp.write(str(self._time[stream][i]) + ',' + str(self._time[stream][i + 1]) + ',' +
-                                    str((self._time[stream][i + 1] - self._time[stream][i]) * self._scaling_factor) + '\n')
+                                    str((self._time[stream][i + 1] - self._time[stream][i]) * self._scaling_factor))
+                            if special_streams is not None:
+                                for special_stream in special_streams:
+                                    fp.write(',' + str(self._special_streams[special_stream][int(i / 2)]))
+                            fp.write('\n')
                 else:
                     with open(stream + '.csv', 'a') as fp:
                         if additional_data is not None and stream in additional_data:
@@ -215,7 +231,11 @@ class Benchmark_Timer():
                             fp.write(str(additional_data[stream][-1]) + '\n')
                         for i in range(0, len(self._time[stream]), 2):
                             fp.write(str(self._time[stream][i]) + ',' + str(self._time[stream][i + 1]) + ',' +
-                                    str((self._time[stream][i + 1] - self._time[stream][i]) * self._scaling_factor) + '\n')
+                                    str((self._time[stream][i + 1] - self._time[stream][i]) * self._scaling_factor))
+                            if special_streams is not None:
+                                for special_stream in special_streams:
+                                    fp.write(',' + str(self._special_streams[special_stream][int(i / 2)]))
+                            fp.write('\n')
                 
 
     def special_streams_to_files(self,
