@@ -47,11 +47,14 @@ class Benchmark_Timer():
     def reset_streams(self,
                       exceptions: Optional[list] = None
                       ):
+        reset_list = []
         for stream in self._time:
             if not stream in exceptions:
-                del self._time[stream]
-                del self._interval[stream]
-                del self._running[stream]
+                reset_list.append(stream)
+        for stream in reset_list:
+            del self._time[stream]
+            del self._interval[stream]
+            del self._running[stream]
 
 
     def reset_special_streams(self,
@@ -105,9 +108,10 @@ class Benchmark_Timer():
                           stream_name
                           ):
         temp = sorted(self._interval[stream_name] + self._time[stream_name])
-        for i in range(len(temp)-1, 0, -1):
-            temp[i] = (temp[i] - temp[i - 1]) * self._scaling_factor
-        temp[0] = 0
+        if len(temp) > 0:
+            for i in range(len(temp)-1, 0, -1):
+                temp[i] = (temp[i] - temp[i - 1]) * self._scaling_factor
+            temp[0] = 0
         return temp
     
 
