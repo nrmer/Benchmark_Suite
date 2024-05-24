@@ -118,12 +118,11 @@ class Benchmark_Timer():
     def _create_intervals(self,
                           stream_name
                           ):
-        temp = sorted(self._interval[stream_name] + self._time[stream_name])
+        temp = self._interval[stream_name]
         if len(temp) > 0:
             for i in range(len(temp)-1, 0, -1):
                 temp[i] = (temp[i] - temp[i - 1]) * self._scaling_factor
-            temp[0] = 0
-        return temp
+        return temp[1:]
     
 
     def _create_path(self, path):
@@ -136,6 +135,7 @@ class Benchmark_Timer():
                     intervals_path: Optional[str] = None,
                     intervals_filename: Optional[str] = None,
                     additional_data: Optional[dict] = None,
+                    special_streams: Optional[list] = None,
                     delimiter: Optional[str] = ','
                     ):
         if intervals_filename is None:
@@ -154,9 +154,12 @@ class Benchmark_Timer():
                     fp.write(str(stream) + delimiter)
                     if len(self._interval[stream]) != 0:
                         interval = self._create_intervals(stream_name=stream)
-                        for i in interval[0:-1]:
-                            fp.write(str(i) + delimiter)
-                        fp.write(str(interval[-1]) + '\n')
+                        for i in range(0, len(interval), 1):
+                            fp.write(str(interval[i]))
+                            if special_streams is not None:
+                                for special_stream in special_streams:
+                                    fp.write(delimiter + str(self._special_streams[special_stream][i]))
+                            fp.write('\n')
         else:
             with open(intervals_filename + '.csv', 'a') as fp:
                 for stream in stream_names:
@@ -166,9 +169,12 @@ class Benchmark_Timer():
                     fp.write(str(stream) + delimiter)
                     if len(self._interval[stream]) != 0:
                         interval = self._create_intervals(stream_name=stream)
-                        for i in interval[0:-1]:
-                            fp.write(str(i) + delimiter)
-                        fp.write(str(interval[-1]) + '\n')
+                        for i in range(0, len(interval), 1):
+                            fp.write(str(interval[i]))
+                            if special_streams is not None:
+                                for special_stream in special_streams:
+                                    fp.write(delimiter + str(self._special_streams[special_stream][i]))
+                            fp.write('\n')
 
 
     
