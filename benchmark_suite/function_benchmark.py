@@ -55,6 +55,7 @@ class Synchronized_Function_Benchmark(Synchronized_Benchmark_Timer):
     def _new_func(self,
                   func_to_benchmark: Callable):
         name = str(func_to_benchmark)
+        print('hi')
         if not name in self._time:
             self.create_timing_stream(stream_name=name)
         self.start_timer(stream_name=name)

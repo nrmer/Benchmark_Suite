@@ -15,6 +15,7 @@ class Benchmark_Timer():
         self._interval = {}
         self._running = {}
         self._special_streams = {}
+        self._aggregate_streams = {}
         self._scaling_factor = output_unit_conversion
         self._scaling_unit = output_unit
 
@@ -26,6 +27,14 @@ class Benchmark_Timer():
         self._time[stream_name] = []
         self._interval[stream_name] = []
         self._running[stream_name] = 0
+
+
+    def create_aggregate_stream(self,
+                             stream_name: Optional[str] = 'standard'
+                             ):
+        if stream_name in self._aggregate_streams:
+            raise Exception(f'The aggregate_streams {stream_name} already exists. Please choose a different name.')
+        self._aggregate_streams[stream_name] = []
 
 
     def create_special_stream(self,
@@ -43,6 +52,17 @@ class Benchmark_Timer():
                 self._time[stream] = []
                 self._interval[stream] = []
                 self._running[stream] = 0
+
+
+    def delete_aggregate_streams(self,
+                    exceptions: Optional[list] = None
+                    ):
+        reset_list = []
+        for stream in self._aggregate_streams:
+            if exceptions == None or not stream in exceptions:
+                reset_list.append(stream)
+        for stream in reset_list:
+            del self._aggregate_streams[stream]
 
     def delete_streams(self,
                       exceptions: Optional[list] = None
@@ -64,6 +84,13 @@ class Benchmark_Timer():
             if exceptions == None or not stream in exceptions:
                 self._special_streams[stream] = []
 
+
+    def reset_aggregate_streams(self,
+                    exceptions: Optional[list] = None
+                    ):
+        for stream in self._aggregate_streams:
+            if exceptions == None or not stream in exceptions:
+                self._aggregate_streams[stream] = []
 
     def delete_special_streams(self,
                       exceptions: Optional[list] = None
@@ -113,6 +140,45 @@ class Benchmark_Timer():
                  stream_name: Optional[str] = 'standard'
                  ):
         self._interval[stream_name].append(self._timer_func())
+
+
+    def add_to_aggregate_streams(self,
+                 aggregate_stream_name: Optional[str] = 'standard',
+                 timing_stream_name: Optional[str] = 'standard',
+                 additional_data: Optional[list] = None,
+                 delimiter: Optional[str] = ','
+
+                 ):
+        sum = 0.0
+        count = 0
+        for i in range(0, len(self._time[timing_stream_name]), 2):
+            sum += self._time[timing_stream_name][i+1] - self._time[timing_stream_name][i]
+            count += 1
+        if count == 0:
+            raise Exception(f'The timing_stream {timing_stream_name} is empty. Please choose a non-empty stream to aggregate.')
+        result_string = str((sum / float(count)) * self._scaling_factor)
+        additional_data_string = ''
+        if additional_data is not None:
+            for i in additional_data:
+                additional_data_string += delimiter + str(i)
+        self._aggregate_streams[aggregate_stream_name].append(result_string + additional_data_string)
+
+
+    def aggregate_stream_to_file(self,
+                 aggregate_stream_name: Optional[str] = 'standard',
+                 aggregate_filename: Optional[str] = None,
+                 aggregate_path: Optional[str] = None):
+        if aggregate_filename is None:
+            aggregate_filename = 'aggregate'
+        if aggregate_path is not None:
+            self._create_path(aggregate_path)
+            with open(aggregate_path + '/' + aggregate_filename + '.csv', 'a') as fp:
+                for data in self._aggregate_streams[aggregate_stream_name]:
+                    fp.write(data + '\n')
+        else:
+            with open(aggregate_filename + '.csv', 'a') as fp:
+                for data in self._aggregate_streams[aggregate_stream_name]:
+                    fp.write(data + '\n')
 
 
     def _create_intervals(self,
