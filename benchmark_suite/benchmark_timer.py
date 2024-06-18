@@ -167,7 +167,8 @@ class Benchmark_Timer():
     def aggregate_stream_to_file(self,
                  aggregate_stream_name: Optional[str] = 'standard',
                  aggregate_filename: Optional[str] = None,
-                 aggregate_path: Optional[str] = None):
+                 aggregate_path: Optional[str] = None,
+                 linebreak: Optional[bool] = False):
         if aggregate_filename is None:
             aggregate_filename = 'aggregate'
         if aggregate_path is not None:
@@ -175,10 +176,14 @@ class Benchmark_Timer():
             with open(aggregate_path + '/' + aggregate_filename + '.csv', 'a') as fp:
                 for data in self._aggregate_streams[aggregate_stream_name]:
                     fp.write(data + '\n')
+                if linebreak:
+                    fp.write('\n')
         else:
             with open(aggregate_filename + '.csv', 'a') as fp:
                 for data in self._aggregate_streams[aggregate_stream_name]:
                     fp.write(data + '\n')
+                if linebreak:
+                    fp.write('\n')
 
 
     def _create_intervals(self,
